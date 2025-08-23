@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: quasar
+  data:
+    mongodb:
+      uri: mongodb://localhost:27018,localhost:27019,localhost:27020/annihilation?replicaSet=rs0
+      database: annihilation
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:cert/keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+    key-alias: tomcat
+
+management:
+    endpoints:
+        web:
+          exposure:
+              include: '*'
+          base-path: /management
+    endpoint:
+      health:
+        show-details: always
