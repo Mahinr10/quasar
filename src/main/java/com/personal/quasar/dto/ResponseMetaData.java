@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseMetaData {
+    private String id;
     private Integer status;
     private String message;
     private Boolean error;

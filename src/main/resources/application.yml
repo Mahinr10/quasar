@@ -1,10 +1,6 @@
 spring:
   application:
     name: quasar
-  data:
-    mongodb:
-      uri: mongodb://localhost:27018,localhost:27019,localhost:27020/annihilation?replicaSet=rs0
-      database: annihilation
 server:
   port: 8443
   ssl:
@@ -15,11 +11,23 @@ server:
     key-alias: tomcat
 
 management:
-    endpoints:
-        web:
-          exposure:
-              include: '*'
-          base-path: /management
-    endpoint:
-      health:
-        show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: /management
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+mongodbConfig:
+  replicaSet: rs0
+  hosts:
+    - localhost:27018
+    - localhost:27019
+    - localhost:27020
+  database: annihilation

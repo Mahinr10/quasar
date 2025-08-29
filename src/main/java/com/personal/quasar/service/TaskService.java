@@ -3,6 +3,7 @@ package com.personal.quasar.service;
 import com.personal.quasar.dao.TaskRepository;
 import com.personal.quasar.entity.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,7 +16,7 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public void create(Task task) {
+    public String create(Task task) {
         // Fill audit fields
         task.setCreatedBy("system"); // Replace with actual user if available
         task.setCreatedDate(new Date());
@@ -23,7 +24,7 @@ public class TaskService {
         task.setLastModifiedDate(new Date());
         task.setId(UUID.randomUUID().toString());
         // Save task to the database
-        taskRepository.save(task);
+        return taskRepository.save(task).getId();
     }
 
     public Task get(String id) {
@@ -42,22 +43,21 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public Task update(String id, Task updatedTask) {
+    public String update(String id, Task updatedTask) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
 
         if (equalsIgnoringAuditFields(updatedTask, existingTask)) {
-            return existingTask;
+            return existingTask.getId();
         }
 
-        // Update fields if they are different
         existingTask.setName(updatedTask.getName());
         existingTask.setDescription(updatedTask.getDescription());
         existingTask.setCompleted(updatedTask.getCompleted());
         existingTask.setLastModifiedBy("system"); // Replace with actual user if available
         existingTask.setLastModifiedDate(new Date());
 
-        return taskRepository.save(existingTask);
+        return taskRepository.save(existingTask).getId();
     }
 
     private boolean equalsIgnoringAuditFields(Task task1, Task task2) {
