@@ -23,12 +23,11 @@ public class TaskService {
         task.setLastModifiedBy("system"); // Replace with actual user if available
         task.setLastModifiedDate(new Date());
         task.setId(UUID.randomUUID().toString());
-        // Save task to the database
         return taskRepository.save(task).getId();
     }
 
     public Task get(String id) {
-        return taskRepository.findById(id)
+        return taskRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
     }
 
@@ -37,10 +36,10 @@ public class TaskService {
     }
 
     public void delete(String id) {
-        if (!taskRepository.existsById(id)) {
-            throw new RuntimeException("Task not found with id: " + id);
-        }
-        taskRepository.deleteById(id);
+        var task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+        task.setIsDeleted(true);
+        update(id, task);
     }
 
     public String update(String id, Task updatedTask) {
@@ -54,7 +53,7 @@ public class TaskService {
         existingTask.setName(updatedTask.getName());
         existingTask.setDescription(updatedTask.getDescription());
         existingTask.setCompleted(updatedTask.getCompleted());
-        existingTask.setLastModifiedBy("system"); // Replace with actual user if available
+        existingTask.setLastModifiedBy("system");
         existingTask.setLastModifiedDate(new Date());
 
         return taskRepository.save(existingTask).getId();

@@ -16,4 +16,5 @@ public abstract class AuditEntity {
     private Date createdDate;
     private String lastModifiedBy;
     private Date lastModifiedDate;
+    private Boolean isDeleted = false;
 }

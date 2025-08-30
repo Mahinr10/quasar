@@ -9,7 +9,10 @@ server:
     key-store-password: password
     key-store-type: PKCS12
     key-alias: tomcat
-
+quasar:
+    jwt:
+        secret: LET_ME_TELL_YOU_A_SECRET_I_AM_JUST_A_BEGINNER_IN_SPRING_BOOT
+        expiration: 3600
 management:
   endpoints:
     web:
