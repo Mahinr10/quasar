@@ -1,6 +1,5 @@
 package com.personal.quasar.config;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;

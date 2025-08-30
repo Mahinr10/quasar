@@ -1,9 +1,9 @@
 package com.personal.quasar.controller;
 
-import com.personal.quasar.model.dto.ResponseMetaData;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,8 +26,7 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO task) {
-        var responseMetaData = new ResponseMetaData();
+    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO task) {
         TaskDTO result = taskService.create(task);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }

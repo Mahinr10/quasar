@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AuthResponse {
+public class AuthResponseDTO {
     String accessToken;
     String refreshToken;
     String expiredAfter;
