@@ -1,4 +1,4 @@
-package com.personal.quasar.entity;
+package com.personal.quasar.model.entity;
 
 
 import lombok.Data;

@@ -1,13 +1,11 @@
 package com.personal.quasar.controller;
 
-import com.personal.quasar.dao.TaskRepository;
-import com.personal.quasar.dto.ResponseMetaData;
-import com.personal.quasar.entity.Task;
+import com.personal.quasar.model.dto.ResponseMetaData;
+import com.personal.quasar.model.dto.TaskDTO;
+import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,23 +26,20 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<ResponseMetaData> createTask(@RequestBody Task task) {
+    public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO task) {
         var responseMetaData = new ResponseMetaData();
-        responseMetaData.setId(taskService.create(task));
-        responseMetaData.setMessage("Task created successfully");
-        responseMetaData.setError(false);
-        responseMetaData.setStatus(HttpStatus.CREATED.value());
-        return new ResponseEntity<>(responseMetaData, HttpStatus.CREATED);
+        TaskDTO result = taskService.create(task);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
-        List<Task> tasks = taskService.getAllTasks();
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
+        List<TaskDTO> tasks = taskService.getAllTasks();
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable String id) {
+    public ResponseEntity<TaskDTO> getTaskById(@PathVariable String id) {
         var task = taskService.get(id);
 
         return Optional.ofNullable(task)
@@ -53,13 +48,9 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseMetaData> updateTask(@PathVariable String id, @RequestBody Task updatedTask) {
-        var responseMetaData = new ResponseMetaData();
-        responseMetaData.setId(taskService.update(id, updatedTask));
-        responseMetaData.setMessage("Task updated successfully");
-        responseMetaData.setError(false);
-        responseMetaData.setStatus(HttpStatus.CREATED.value());
-        return new ResponseEntity<>(responseMetaData, HttpStatus.OK);
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @RequestBody TaskDTO updatedTask) {
+        TaskDTO result = taskService.update(id, updatedTask);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

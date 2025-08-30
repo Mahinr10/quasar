@@ -1,4 +1,4 @@
-package com.personal.quasar.dto;
+package com.personal.quasar.model.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

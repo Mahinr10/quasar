@@ -1,7 +1,7 @@
 package com.personal.quasar.service;
 
 import com.personal.quasar.dao.UserRepository;
-import com.personal.quasar.entity.User;
+import com.personal.quasar.model.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

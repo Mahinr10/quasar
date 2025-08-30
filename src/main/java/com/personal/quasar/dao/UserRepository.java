@@ -1,6 +1,6 @@
 package com.personal.quasar.dao;
 
-import com.personal.quasar.entity.User;
+import com.personal.quasar.model.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

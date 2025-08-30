@@ -1,7 +1,7 @@
 package com.personal.quasar.controller;
 
-import com.personal.quasar.dto.AuthResponse;
-import com.personal.quasar.entity.User;
+import com.personal.quasar.model.dto.AuthResponse;
+import com.personal.quasar.model.entity.User;
 import com.personal.quasar.service.UserService;
 import com.personal.quasar.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,7 +55,7 @@ public class AuthController {
         var res = new AuthResponse();
         res.setAccessToken(jwtUtil.generateAccessToken(user.getEmail()));
         res.setRefreshToken(jwtUtil.generateRefreshToken(user.getEmail()));
-        res.setExpiredAfter("300s");
+        res.setExpiredAfter("3600s");
         return ResponseEntity.ok(res);
     }
 
