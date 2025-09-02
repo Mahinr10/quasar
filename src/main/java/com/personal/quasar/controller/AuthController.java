@@ -27,9 +27,6 @@ public class AuthController {
     private AuthService authService;
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
