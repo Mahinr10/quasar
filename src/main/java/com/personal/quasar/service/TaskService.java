@@ -1,9 +1,11 @@
 package com.personal.quasar.service;
 
 import com.personal.quasar.dao.TaskRepository;
+import com.personal.quasar.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.model.mapper.TaskMapper;
+import com.personal.quasar.service.validator.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,11 @@ public class TaskService {
     @Autowired
     private TaskMapper taskMapper;
 
-    public TaskDTO create(TaskDTO task) {
+    @Autowired
+    private TaskValidator taskValidator;
+
+    public TaskDTO create(TaskDTO task) throws InvalidFieldException {
+        taskValidator.validateScheduledDate(task.getScheduledDate());
         var newTask = taskMapper.dtoToEntity(task);
         newTask.setCreatedBy("system"); // Replace with actual user if available
         newTask.setCreatedDate(new Date());
@@ -50,7 +56,8 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public TaskDTO update(String id, TaskDTO updatedTask) {
+    public TaskDTO update(String id, TaskDTO updatedTask) throws InvalidFieldException {
+        taskValidator.validateScheduledDate(updatedTask.getScheduledDate());
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
 

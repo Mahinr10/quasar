@@ -1,5 +1,6 @@
 package com.personal.quasar.controller;
 
+import com.personal.quasar.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.service.TaskService;
@@ -26,7 +27,7 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO task) {
+    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO task) throws InvalidFieldException {
         TaskDTO result = taskService.create(task);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
@@ -47,7 +48,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @RequestBody TaskDTO updatedTask) {
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable String id, @RequestBody TaskDTO updatedTask) throws InvalidFieldException {
         TaskDTO result = taskService.update(id, updatedTask);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

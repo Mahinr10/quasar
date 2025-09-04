@@ -1,7 +1,11 @@
 package com.personal.quasar.service;
 
 import com.personal.quasar.dao.UserRepository;
+import com.personal.quasar.exception.ImmutableFieldModificationException;
+import com.personal.quasar.exception.ResourceDoesNotExistException;
+import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
+import com.personal.quasar.model.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,8 +22,10 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     public String create(User user) {
-        // Fill audit fields
         user.setCreatedBy("system"); // Replace with actual user if available
         user.setCreatedDate(new Date());
         user.setLastModifiedBy("system"); // Replace with actual user if available
@@ -29,9 +35,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user).getId();
     }
 
-    public User get(String id) {
-        return userRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    public UserDTO get(String id) throws ResourceDoesNotExistException {
+        var user = userRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ResourceDoesNotExistException("user", id));
+        return userMapper.entityToDTO(user);
     }
 
     public User getByEmail(String email) {
@@ -43,36 +50,36 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByEmailAndIsDeletedFalse(email);
     }
 
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public void delete(String id) {
-        var user = get(id);
-        user.setIsDeleted(true);
-        update(id, user);
-    }
-
-    public String update(String id, User updatedUser) {
-        User existingUser = get(id);
-
-        if (equalsIgnoringAuditFields(updatedUser, existingUser)) {
-            return existingUser.getId();
+    public UserDTO update(String id, UserDTO updatedUser)
+            throws ImmutableFieldModificationException, ResourceDoesNotExistException {
+        User existingUser = userRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(
+                    () -> new ResourceDoesNotExistException("user", id)
+                );
+        if (!existingUser.getEmail().equals(updatedUser.getEmail())) {
+            throw new ImmutableFieldModificationException(List.of(UserDTO.Fields.email));
+        }
+        if (equalsIgnoringAuditFields(existingUser, updatedUser)) {
+            return updatedUser;
         }
 
-        existingUser.setName(updatedUser.getName());
-        existingUser.setEmail(updatedUser.getEmail());
-        // Update other fields as needed
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
         existingUser.setLastModifiedBy("system");
         existingUser.setLastModifiedDate(new Date());
 
-        return userRepository.save(existingUser).getId();
+        var savedUser = userRepository.save(existingUser);
+        return userMapper.entityToDTO(savedUser);
     }
 
-    private boolean equalsIgnoringAuditFields(User user1, User user2) {
-        return user1.getName().equals(user2.getName()) &&
-                user1.getEmail().equals(user2.getEmail());
+    private boolean equalsIgnoringAuditFields(User user, UserDTO userDTO) {
+        return user.getFirstName().equals(userDTO.getFirstName()) &&
+                user.getLastName().equals(userDTO.getLastName()) &&
+                user.getEmail().equals(userDTO.getEmail());
     }
 
     @Override
