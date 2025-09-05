@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -74,9 +74,7 @@ public class UserService implements UserDetailsService {
         return user1.getName().equals(user2.getName()) &&
                 user1.getEmail().equals(user2.getEmail());
     }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmailAndIsDeletedFalse(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }

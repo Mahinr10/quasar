@@ -3,6 +3,7 @@ package com.personal.quasar.service;
 import com.personal.quasar.dao.TaskRepository;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
+import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,14 @@ public class TaskService {
     @Autowired
     private TaskMapper taskMapper;
 
+    @Autowired
+    private UserProfileFacade userProfileFacade;
+
     public TaskDTO create(TaskDTO task) {
         var newTask = taskMapper.dtoToEntity(task);
-        newTask.setCreatedBy("system"); // Replace with actual user if available
+        newTask.setCreatedBy(userProfileFacade.getActiveUserId()); // Replace with actual user if available
         newTask.setCreatedDate(new Date());
-        newTask.setLastModifiedBy("system"); // Replace with actual user if available
+        newTask.setLastModifiedBy(userProfileFacade.getActiveUserId()); // Replace with actual user if available
         newTask.setLastModifiedDate(new Date());
         newTask.setId(UUID.randomUUID().toString());
         Task savedTask = taskRepository.save(newTask);

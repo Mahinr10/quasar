@@ -13,18 +13,8 @@ import java.util.Collection;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document("user")
-public class User extends AuditEntity implements UserDetails {
+public class User extends AuditEntity {
     private String name;
     private String password;
     private String email;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return getEmail();
-    }
 }
