@@ -14,7 +14,8 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = true)
 @Document("user")
 public class User extends AuditEntity {
-    private String name;
+    private String firstName;
+    private String lastName;
     private String password;
     private String email;
 }
