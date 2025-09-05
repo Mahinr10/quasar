@@ -1,7 +1,6 @@
-package com.personal.quasar.filter;
+package com.personal.quasar.common.filter;
 
-import com.personal.quasar.model.dto.UserDTO;
-import com.personal.quasar.service.UserService;
+import com.personal.quasar.service.impl.UserService;
 import com.personal.quasar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

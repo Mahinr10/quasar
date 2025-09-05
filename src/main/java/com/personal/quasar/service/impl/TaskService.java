@@ -1,16 +1,15 @@
-package com.personal.quasar.service;
+package com.personal.quasar.service.impl;
 
 import com.personal.quasar.dao.TaskRepository;
-import com.personal.quasar.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
-import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.TaskMapper;
-import com.personal.quasar.service.validator.TaskValidator;
+import com.personal.quasar.service.AuditService;
+import com.personal.quasar.validator.TaskValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 

@@ -1,10 +1,10 @@
 package com.personal.quasar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.personal.quasar.filter.JwtAuthenticationFilter;
+import com.personal.quasar.common.filter.JwtAuthenticationFilter;
 import com.personal.quasar.model.dto.AuthRequestDTO;
 import com.personal.quasar.model.dto.AuthResponseDTO;
-import com.personal.quasar.service.AuthService;
+import com.personal.quasar.service.impl.AuthService;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

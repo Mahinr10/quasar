@@ -1,9 +1,9 @@
 package com.personal.quasar.controller;
 
-import com.personal.quasar.exception.ImmutableFieldModificationException;
-import com.personal.quasar.exception.ResourceDoesNotExistException;
+import com.personal.quasar.common.exception.ImmutableFieldModificationException;
+import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
-import com.personal.quasar.service.UserService;
+import com.personal.quasar.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

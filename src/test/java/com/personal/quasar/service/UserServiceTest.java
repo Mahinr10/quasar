@@ -1,13 +1,13 @@
 package com.personal.quasar.service;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.personal.quasar.UnitTest;
 import com.personal.quasar.dao.UserRepository;
-import com.personal.quasar.exception.ImmutableFieldModificationException;
-import com.personal.quasar.exception.ResourceDoesNotExistException;
+import com.personal.quasar.common.exception.ImmutableFieldModificationException;
+import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.UserMapper;
+import com.personal.quasar.service.impl.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;

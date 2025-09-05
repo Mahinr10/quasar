@@ -1,13 +1,12 @@
-package com.personal.quasar.service;
+package com.personal.quasar.service.impl;
 
 import com.personal.quasar.dao.UserRepository;
-import com.personal.quasar.exception.ImmutableFieldModificationException;
-import com.personal.quasar.exception.InvalidFieldException;
-import com.personal.quasar.exception.ResourceDoesNotExistException;
+import com.personal.quasar.common.exception.ImmutableFieldModificationException;
+import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.UserMapper;
-import jakarta.validation.Valid;
+import com.personal.quasar.service.AuditService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;

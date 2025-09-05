@@ -1,7 +1,8 @@
 package com.personal.quasar.service.validator;
 
 import com.personal.quasar.UnitTest;
-import com.personal.quasar.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.InvalidFieldException;
+import com.personal.quasar.validator.TaskValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

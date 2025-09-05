@@ -3,6 +3,8 @@ package com.personal.quasar.service;
 import com.personal.quasar.UnitTest;
 import com.personal.quasar.model.dto.AuthRequestDTO;
 import com.personal.quasar.model.dto.UserDTO;
+import com.personal.quasar.service.impl.AuthService;
+import com.personal.quasar.service.impl.UserService;
 import com.personal.quasar.util.JwtUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

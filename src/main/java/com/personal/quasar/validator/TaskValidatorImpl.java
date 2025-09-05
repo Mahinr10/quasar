@@ -1,6 +1,6 @@
-package com.personal.quasar.service.validator;
+package com.personal.quasar.validator;
 
-import com.personal.quasar.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.InvalidFieldException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;

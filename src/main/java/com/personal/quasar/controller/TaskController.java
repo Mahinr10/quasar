@@ -1,9 +1,9 @@
 package com.personal.quasar.controller;
 
-import com.personal.quasar.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
-import com.personal.quasar.service.TaskService;
+import com.personal.quasar.service.impl.TaskService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

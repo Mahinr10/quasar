@@ -2,11 +2,12 @@ package com.personal.quasar.service;
 
 import com.personal.quasar.UnitTest;
 import com.personal.quasar.dao.TaskRepository;
-import com.personal.quasar.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
 import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.model.mapper.TaskMapper;
-import com.personal.quasar.service.validator.TaskValidator;
+import com.personal.quasar.service.impl.TaskService;
+import com.personal.quasar.validator.TaskValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

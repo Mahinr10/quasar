@@ -2,10 +2,10 @@ package com.personal.quasar.service;
 
 import com.personal.quasar.UnitTest;
 import com.personal.quasar.model.entity.AuditEntity;
+import com.personal.quasar.service.impl.AuditServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

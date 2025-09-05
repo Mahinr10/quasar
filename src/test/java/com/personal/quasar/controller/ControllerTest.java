@@ -1,7 +1,7 @@
 package com.personal.quasar.controller;
 
 import com.personal.quasar.UnitTest;
-import com.personal.quasar.service.UserService;
+import com.personal.quasar.service.impl.UserService;
 import lombok.Getter;
 import lombok.Setter;
 import org.mockito.Mock;

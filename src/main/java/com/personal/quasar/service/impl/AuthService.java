@@ -1,4 +1,4 @@
-package com.personal.quasar.service;
+package com.personal.quasar.service.impl;
 
 import com.personal.quasar.dao.UserRepository;
 import com.personal.quasar.model.dto.AuthRequestDTO;
@@ -6,10 +6,8 @@ import com.personal.quasar.model.dto.AuthResponseDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,6 +1,7 @@
 package com.personal.quasar.service;
 
 import com.personal.quasar.UnitTest;
+import com.personal.quasar.service.impl.UserProfileService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

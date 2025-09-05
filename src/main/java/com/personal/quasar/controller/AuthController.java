@@ -2,8 +2,7 @@ package com.personal.quasar.controller;
 
 import com.personal.quasar.model.dto.AuthRequestDTO;
 import com.personal.quasar.model.dto.AuthResponseDTO;
-import com.personal.quasar.service.AuthService;
-import com.personal.quasar.service.UserService;
+import com.personal.quasar.service.impl.AuthService;
 import com.personal.quasar.util.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")

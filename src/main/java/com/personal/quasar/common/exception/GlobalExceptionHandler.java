@@ -1,4 +1,4 @@
-package com.personal.quasar.exception;
+package com.personal.quasar.common.exception;
 
 import com.personal.quasar.model.dto.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;

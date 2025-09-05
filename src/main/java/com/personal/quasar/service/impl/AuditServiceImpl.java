@@ -1,6 +1,8 @@
-package com.personal.quasar.service;
+package com.personal.quasar.service.impl;
 
 import com.personal.quasar.model.entity.AuditEntity;
+import com.personal.quasar.service.UserProfileFacade;
+import com.personal.quasar.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

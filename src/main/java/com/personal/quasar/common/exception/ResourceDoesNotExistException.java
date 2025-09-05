@@ -1,4 +1,4 @@
-package com.personal.quasar.exception;
+package com.personal.quasar.common.exception;
 
 public class ResourceDoesNotExistException extends Exception {
     public static final String MESSAGE = "Resource of type %s with id %s does not exist";

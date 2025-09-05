@@ -1,17 +1,11 @@
 package com.personal.quasar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.personal.quasar.UnitTest;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
-import com.personal.quasar.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;

@@ -1,4 +1,4 @@
-package com.personal.quasar.exception;
+package com.personal.quasar.common.exception;
 
 import java.util.List;
 
