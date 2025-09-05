@@ -1,17 +1,15 @@
 package com.personal.quasar.service.validator;
 
-import com.personal.quasar.BaseTests;
+import com.personal.quasar.UnitTest;
 import com.personal.quasar.exception.InvalidFieldException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-public class TaskValidatorTest extends BaseTests {
+public class TaskValidatorTest extends UnitTest {
 
     @Autowired
     private TaskValidator taskValidator;

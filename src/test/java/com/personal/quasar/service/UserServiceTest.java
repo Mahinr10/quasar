@@ -1,31 +1,55 @@
 package com.personal.quasar.service;
 
-import com.personal.quasar.BaseTests;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.personal.quasar.UnitTest;
 import com.personal.quasar.dao.UserRepository;
 import com.personal.quasar.exception.ImmutableFieldModificationException;
 import com.personal.quasar.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.UserMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class UserServiceTest extends BaseTests {
+public class UserServiceTest extends UnitTest {
     @Mock
     UserRepository userRepository;
 
     @Mock
     UserMapper userMapper;
 
+    @Mock
+    AuditService auditService;
+
     @InjectMocks
     UserService userService;
+
+    Validator validator;
+
+    @BeforeEach
+    public void executeBeforeEach() {
+        doNothing().when(auditService).populateAuditFields(any());
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
 
     @Test void getTest() throws Exception {
         String id = "abc";
@@ -73,7 +97,7 @@ public class UserServiceTest extends BaseTests {
         Assertions.assertEquals(id, result.getId());
         Assertions.assertEquals("John", result.getFirstName());
         Assertions.assertEquals("Doe", result.getLastName());
-        Assertions.assertEquals("john.doe@gmail.com", result.getEmail());
+        Assertions.assertEquals("user@test.com", result.getEmail());
     }
 
     @Test()
@@ -100,7 +124,7 @@ public class UserServiceTest extends BaseTests {
     }
 
     @Test
-    public void UpdateWithNonExistingUserTest() {
+    public void updateWithNonExistingUserTest() {
         String id = "abc";
         var userDTO = getUserDTO(id);
         when(userRepository.findByIdAndIsDeletedFalse(id)).thenReturn(Optional.empty());
@@ -110,12 +134,74 @@ public class UserServiceTest extends BaseTests {
         Assertions.assertEquals(String.format(ResourceDoesNotExistException.MESSAGE, "user", id), exception.getMessage());
     }
 
+    @Test
+    public void loadUserByEmailIdTest() {
+        String email = "user@test.com";
+        User user = getUser("abc");
+        UserDTO userDTO = getUserDTO("abc");
+        when(userRepository.findByEmailAndIsDeletedFalse(email)).thenReturn(Optional.of(user));
+        when(userMapper.entityToDTO(user)).thenReturn(userDTO);
+        var result = userService.loadUserByUsername(email);
+        Assertions.assertInstanceOf(UserDTO.class, result);
+        Assertions.assertEquals(email, result.getEmail());
+    }
+
+    @Test
+    public void saveUserWithEmailAndPasswordTest() throws Exception{
+        String email = "user@test.com";
+        String password = "password";
+
+        User user = getUser(null);
+        user.setId(null);
+        user.setFirstName(null);
+        user.setLastName(null);
+
+        UserDTO userDTO = getUserDTO("abc");
+
+        when(userRepository.save(any())).thenReturn(user);
+        when(userMapper.entityToDTO(any())).thenReturn(userDTO);
+        doNothing().when(auditService).populateAuditFields(any());
+
+        var result = userService.saveUser(email, password);
+        Assertions.assertEquals(result.getId(), userDTO.getId());
+        verify(auditService, times(1)).populateAuditFields(any());
+    }
+
+    @Test
+    public void saveUserWithEmailAndNullPasswordTest() {
+        String email = "user@test.com";
+        String password = null;
+        var exception = Assertions.assertThrows(Exception.class, () -> {
+            validateParameters("saveUser", new Object[]{email, password});
+        });
+        Assertions.assertEquals("saveUser.encryptedPassword: password cannot be null", exception.getMessage());
+    }
+    @Test
+    public void saveUserWithNullEmailAndPasswordTest() {
+        String email = null;
+        String password = "password";
+        var exception = Assertions.assertThrows(Exception.class, () -> {
+            validateParameters("saveUser", new Object[]{email, password});
+        });
+        Assertions.assertEquals("saveUser.email: Email cannot be null", exception.getMessage());
+    }
+
+    @Test
+    public void saveUserWithInvalidEmailAndPasswordTest() {
+        String email = "invalid-email";
+        String password = "password";
+        var exception = Assertions.assertThrows(Exception.class, () -> {
+            validateParameters("saveUser", new Object[]{email, password});
+        });
+        Assertions.assertEquals("saveUser.email: Provided invalid email", exception.getMessage());
+    }
+
     private User getUser(String id) {
         var user = new User();
         user.setId(id);
         user.setFirstName("John");
         user.setLastName("Doe");
-        user.setEmail("john.doe@gmail.com");
+        user.setEmail("user@test.com");
         return user;
     }
 
@@ -124,8 +210,21 @@ public class UserServiceTest extends BaseTests {
         userDTO.setId(id);
         userDTO.setFirstName("John");
         userDTO.setLastName("Doe");
-        userDTO.setEmail("john.doe@gmail.com");
+        userDTO.setEmail("user@test.com");
         return userDTO;
+    }
+
+    private void validateParameters(String methodName, Object[] parameters) {
+        try {
+            Method method = UserService.class.getMethod(methodName, String.class, String.class);
+            Set<ConstraintViolation<UserService>> violations = validator.forExecutables()
+                    .validateParameters(userService, method, parameters);
+            if (!violations.isEmpty()) {
+                throw new ConstraintViolationException(violations);
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Method not found: " + methodName, e);
+        }
     }
 
 }

@@ -22,20 +22,15 @@ public class TaskService {
 
     @Autowired
     private TaskMapper taskMapper;
-
     @Autowired
-    private UserProfileFacade userProfileFacade;
-
+    private AuditService auditService;
     @Autowired
     private TaskValidator taskValidator;
 
     public TaskDTO create(TaskDTO task) throws InvalidFieldException {
         taskValidator.validateScheduledDate(task.getScheduledDate());
         var newTask = taskMapper.dtoToEntity(task);
-        newTask.setCreatedBy(userProfileFacade.getActiveUserId()); // Replace with actual user if available
-        newTask.setCreatedDate(new Date());
-        newTask.setLastModifiedBy(userProfileFacade.getActiveUserId()); // Replace with actual user if available
-        newTask.setLastModifiedDate(new Date());
+        auditService.populateAuditFields(newTask);
         newTask.setId(UUID.randomUUID().toString());
         Task savedTask = taskRepository.save(newTask);
         return taskMapper.entityToDTO(savedTask);
@@ -57,6 +52,7 @@ public class TaskService {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
         task.setIsDeleted(true);
+        auditService.populateAuditFields(task);
         taskRepository.save(task);
     }
 
@@ -72,8 +68,8 @@ public class TaskService {
         existingTask.setName(updatedTask.getName());
         existingTask.setDescription(updatedTask.getDescription());
         existingTask.setCompleted(updatedTask.getCompleted());
-        existingTask.setLastModifiedBy("system");
-        existingTask.setLastModifiedDate(new Date());
+
+        auditService.populateAuditFields(existingTask);
 
         Task savedTask = taskRepository.save(existingTask);
         return taskMapper.entityToDTO(savedTask);

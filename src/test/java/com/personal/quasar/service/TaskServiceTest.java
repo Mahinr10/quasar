@@ -1,6 +1,6 @@
 package com.personal.quasar.service;
 
-import com.personal.quasar.BaseTests;
+import com.personal.quasar.UnitTest;
 import com.personal.quasar.dao.TaskRepository;
 import com.personal.quasar.exception.InvalidFieldException;
 import com.personal.quasar.model.dto.TaskDTO;
@@ -8,19 +8,20 @@ import com.personal.quasar.model.entity.Task;
 import com.personal.quasar.model.mapper.TaskMapper;
 import com.personal.quasar.service.validator.TaskValidator;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-public class TaskServiceTest extends BaseTests {
+public class TaskServiceTest extends UnitTest {
 
     @Mock
     private TaskRepository taskRepository;
@@ -31,8 +32,17 @@ public class TaskServiceTest extends BaseTests {
     @Mock
     private TaskValidator taskValidator;
 
+    @Mock
+    AuditService auditService;
+
     @InjectMocks
     private TaskService taskService;
+
+    @BeforeEach
+    public void executeBeforeEach() {
+        doNothing().when(auditService).populateAuditFields(any());
+    }
+
     @Test
     public void createTest() {
         var taskDTO = getTaskDTO();

@@ -1,7 +1,6 @@
 package com.personal.quasar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.personal.quasar.BaseTests;
 import com.personal.quasar.filter.JwtAuthenticationFilter;
 import com.personal.quasar.model.dto.AuthRequestDTO;
 import com.personal.quasar.model.dto.AuthResponseDTO;

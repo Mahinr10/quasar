@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserProfileService implements UserProfileFacade {
-    @Autowired
-    UserService userService;
     @Override
     public String getActiveUserId() {
         var userId = SecurityContextHolder.getContext().getAuthentication().getName();

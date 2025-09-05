@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class AuthService {
-
     @Autowired
     private UserService userService;
 
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -39,7 +37,7 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO request) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUserName(), request.getPassword()
         ));
         var result = new AuthResponseDTO();
@@ -62,7 +60,7 @@ public class AuthService {
     }
     private void saveUser(AuthRequestDTO request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        userRepository.save(getUser(request.getUserName(), encodedPassword));
+        userService.saveUser(request.getUserName(), encodedPassword);
     }
 
     private User getUser(String userName, String password) {

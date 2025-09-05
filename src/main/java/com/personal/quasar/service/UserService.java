@@ -2,38 +2,35 @@ package com.personal.quasar.service;
 
 import com.personal.quasar.dao.UserRepository;
 import com.personal.quasar.exception.ImmutableFieldModificationException;
+import com.personal.quasar.exception.InvalidFieldException;
 import com.personal.quasar.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.UserMapper;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.context.annotation.ApplicationScope;
 
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
+@Validated
+@ApplicationScope
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private UserMapper userMapper;
+    private AuditService auditService;
 
-    public String create(User user) {
-        user.setCreatedBy("system"); // Replace with actual user if available
-        user.setCreatedDate(new Date());
-        user.setLastModifiedBy("system"); // Replace with actual user if available
-        user.setLastModifiedDate(new Date());
-        user.setId(UUID.randomUUID().toString());
-        user.setIsDeleted(false); // Ensure the user is not marked as deleted
-        return userRepository.save(user).getId();
-    }
+    @Autowired
+    private UserMapper userMapper;
 
     public UserDTO get(String id) throws ResourceDoesNotExistException {
         var user = userRepository.findByIdAndIsDeletedFalse(id)
@@ -41,19 +38,9 @@ public class UserService {
         return userMapper.entityToDTO(user);
     }
 
-    public User getByEmail(String email) {
-        return userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-    }
-
     public Boolean checkUserWithEmailExist(String email) {
         return userRepository.existsByEmailAndIsDeletedFalse(email);
     }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     public UserDTO update(String id, UserDTO updatedUser)
             throws ImmutableFieldModificationException, ResourceDoesNotExistException {
         User existingUser = userRepository.findByIdAndIsDeletedFalse(id)
@@ -67,10 +54,7 @@ public class UserService {
             return updatedUser;
         }
 
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setLastModifiedBy("system");
-        existingUser.setLastModifiedDate(new Date());
+        auditService.populateAuditFields(existingUser);
 
         var savedUser = userRepository.save(existingUser);
         return userMapper.entityToDTO(savedUser);
@@ -81,8 +65,24 @@ public class UserService {
                 user.getLastName().equals(userDTO.getLastName()) &&
                 user.getEmail().equals(userDTO.getEmail());
     }
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmailAndIsDeletedFalse(username)
+    public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmailAndIsDeletedFalse(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+        return userMapper.entityToDTO(user);
+    }
+
+    public UserDTO saveUser(
+            @NotNull(message = "Email cannot be null")
+            @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Provided invalid email")
+            String email,
+
+            @NotNull(message = "password cannot be null")
+            String encryptedPassword
+    ) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(encryptedPassword);
+        auditService.populateAuditFields(user);
+        return userMapper.entityToDTO(userRepository.save(user));
     }
 }
