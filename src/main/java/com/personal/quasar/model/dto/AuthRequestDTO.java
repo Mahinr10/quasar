@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthRequestDTO {
     @NotNull
-    @Size(min = 10, max = 100)
+    @Size(min = 5, max = 100)
     private String userName;
 
     @NotNull

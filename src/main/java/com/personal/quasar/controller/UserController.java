@@ -19,7 +19,7 @@ public class UserController {
 
     @Autowired
     UserService userService;
-    @PutMapping("/")
+    @PutMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable String id,@Validated @RequestBody UserDTO user)
             throws ImmutableFieldModificationException, ResourceDoesNotExistException {
         return ResponseEntity.ok(userService.update(id, user));
