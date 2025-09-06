@@ -1,5 +1,8 @@
 package com.personal.quasar.util;
 
+import com.personal.quasar.model.dto.UserDTO;
+import com.personal.quasar.model.enums.UserRole;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +22,19 @@ public class JwtUtil {
 
     public String generateAccessToken(String email) {
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-
         return Jwts.builder()
                 .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateAccessToken(UserDTO user) {
+        SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("role", user.getUserRole())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
@@ -47,6 +60,19 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public UserDTO extractUser(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        UserDTO user = new UserDTO();
+        user.setEmail(claims.getSubject());
+        user.setUserRole(UserRole.valueOf((String) claims.get("role")));
+        return user;
     }
 
     public boolean validateToken(String token) {

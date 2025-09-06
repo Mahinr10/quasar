@@ -1,5 +1,6 @@
 package com.personal.quasar.common.filter;
 
+import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.service.impl.UserService;
 import com.personal.quasar.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -28,16 +29,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         String token = null;
-        String email = null;
+        UserDTO user = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            email = jwtUtil.extractEmail(token);
+            user = jwtUtil.extractUser(token);
         }
 
-        if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var userDetails = userService.loadUserByUsername(email);
+        if(user != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if(jwtUtil.validateToken(token)) {
-                var authToken = new UsernamePasswordAuthenticationToken(userDetails, null);
+                var authToken = new UsernamePasswordAuthenticationToken(user, null);
                 authToken.setDetails(new WebAuthenticationDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
