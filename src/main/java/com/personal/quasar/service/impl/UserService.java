@@ -17,6 +17,13 @@ import org.springframework.web.context.annotation.ApplicationScope;
 
 import java.util.List;
 
+import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_ENTITY;
+import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_NOT_FOUND_WITH_EMAIL;
+import static com.personal.quasar.util.ValidationConstants.EMAIL_REGEX;
+import static com.personal.quasar.util.ValidationErrorMessages.EMAIL_CANNOT_BE_NULL;
+import static com.personal.quasar.util.ValidationErrorMessages.PASSWORD_CANNOT_BE_NULL;
+import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_EMAIL;
+
 @Service
 @Validated
 @ApplicationScope
@@ -33,7 +40,7 @@ public class UserService {
 
     public UserDTO get(String id) throws ResourceDoesNotExistException {
         var user = userRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new ResourceDoesNotExistException("user", id));
+                .orElseThrow(() -> new ResourceDoesNotExistException(USER_ENTITY, id));
         return userMapper.entityToDTO(user);
     }
 
@@ -44,7 +51,7 @@ public class UserService {
             throws ImmutableFieldModificationException, ResourceDoesNotExistException {
         User existingUser = userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(
-                    () -> new ResourceDoesNotExistException("user", id)
+                    () -> new ResourceDoesNotExistException(USER_ENTITY, id)
                 );
         if (!existingUser.getEmail().equals(updatedUser.getEmail())) {
             throw new ImmutableFieldModificationException(List.of(UserDTO.Fields.email));
@@ -66,16 +73,21 @@ public class UserService {
     }
     public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmailAndIsDeletedFalse(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_WITH_EMAIL + " " + username));
         return userMapper.entityToDTO(user);
     }
 
+    User getUserByEmail(String username) throws ResourceDoesNotExistException {
+        return userRepository.findByEmailAndIsDeletedFalse(username)
+                .orElseThrow(() -> new ResourceDoesNotExistException(USER_NOT_FOUND_WITH_EMAIL + " " + username));
+    }
+
     public UserDTO saveUser(
-            @NotNull(message = "Email cannot be null")
-            @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Provided invalid email")
+            @NotNull(message = EMAIL_CANNOT_BE_NULL)
+            @Pattern(regexp = EMAIL_REGEX, message = PROVIDED_INVALID_EMAIL)
             String email,
 
-            @NotNull(message = "password cannot be null")
+            @NotNull(message = PASSWORD_CANNOT_BE_NULL)
             String encryptedPassword
     ) {
         User user = new User();
