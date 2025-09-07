@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class AuthService {
     @Autowired
     private UserService userService;
-
-    private UserRepository userRepository;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -39,8 +36,9 @@ public class AuthService {
                 request.getUserName(), request.getPassword()
         ));
         var result = new AuthResponseDTO();
-        result.setAccessToken(jwtUtil.generateAccessToken(request.getUserName()));
-        result.setRefreshToken(jwtUtil.generateRefreshToken(request.getPassword()));
+        var userDTO = userService.loadUserByUsername(request.getUserName());
+        result.setAccessToken(jwtUtil.generateAccessToken(userDTO));
+        result.setRefreshToken(jwtUtil.generateRefreshToken(userDTO.getEmail()));
         result.setExpiredAfter("3600s");
         return result;
     }
@@ -49,22 +47,16 @@ public class AuthService {
         if(!jwtUtil.validateToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
         }
-        var userName = jwtUtil.extractEmail(refreshToken);
+        var email = jwtUtil.extractEmail(refreshToken);
+        var userDTO = userService.loadUserByUsername(email);
         var result = new AuthResponseDTO();
-        result.setAccessToken(jwtUtil.generateAccessToken(userName));
-        result.setRefreshToken(jwtUtil.generateRefreshToken(userName));
+        result.setAccessToken(jwtUtil.generateAccessToken(userDTO));
+        result.setRefreshToken(jwtUtil.generateRefreshToken(userDTO.getEmail()));
         result.setExpiredAfter("3600s");
         return result;
     }
     private void saveUser(AuthRequestDTO request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         userService.saveUser(request.getUserName(), encodedPassword);
-    }
-
-    private User getUser(String userName, String password) {
-        var user = new User();
-        user.setEmail(userName);
-        user.setPassword(password);
-        return user;
     }
 }

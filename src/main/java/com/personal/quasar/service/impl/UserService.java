@@ -69,7 +69,8 @@ public class UserService {
     private boolean equalsIgnoringAuditFields(User user, UserDTO userDTO) {
         return user.getFirstName().equals(userDTO.getFirstName()) &&
                 user.getLastName().equals(userDTO.getLastName()) &&
-                user.getEmail().equals(userDTO.getEmail());
+                user.getEmail().equals(userDTO.getEmail()) &&
+                user.getUserRole().equals(userDTO.getUserRole());
     }
     public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmailAndIsDeletedFalse(username)
