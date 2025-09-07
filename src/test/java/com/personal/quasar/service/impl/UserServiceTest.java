@@ -1,4 +1,4 @@
-package com.personal.quasar.service;
+package com.personal.quasar.service.impl;
 
 import com.personal.quasar.UnitTest;
 import com.personal.quasar.dao.UserRepository;
@@ -7,6 +7,7 @@ import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.model.mapper.UserMapper;
+import com.personal.quasar.service.AuditService;
 import com.personal.quasar.service.impl.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -23,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_ENTITY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -75,7 +77,7 @@ public class UserServiceTest extends UnitTest {
             userService.get(id);
         });
 
-        Assertions.assertEquals(String.format(ResourceDoesNotExistException.MESSAGE, "user", id), exception.getMessage());
+        Assertions.assertEquals(String.format(ResourceDoesNotExistException.MESSAGE, USER_ENTITY, id), exception.getMessage());
     }
 
     @Test
@@ -131,7 +133,7 @@ public class UserServiceTest extends UnitTest {
         var exception = Assertions.assertThrows(ResourceDoesNotExistException.class, () -> {
             userService.update(id, userDTO);
         });
-        Assertions.assertEquals(String.format(ResourceDoesNotExistException.MESSAGE, "user", id), exception.getMessage());
+        Assertions.assertEquals(String.format(ResourceDoesNotExistException.MESSAGE, USER_ENTITY, id), exception.getMessage());
     }
 
     @Test
@@ -174,7 +176,7 @@ public class UserServiceTest extends UnitTest {
         var exception = Assertions.assertThrows(Exception.class, () -> {
             validateParameters("saveUser", new Object[]{email, password});
         });
-        Assertions.assertEquals("saveUser.encryptedPassword: password cannot be null", exception.getMessage());
+        Assertions.assertEquals("saveUser.encryptedPassword: Password cannot be null", exception.getMessage());
     }
     @Test
     public void saveUserWithNullEmailAndPasswordTest() {
@@ -194,6 +196,17 @@ public class UserServiceTest extends UnitTest {
             validateParameters("saveUser", new Object[]{email, password});
         });
         Assertions.assertEquals("saveUser.email: Provided invalid email", exception.getMessage());
+    }
+
+    @Test
+    public void getUserByEmailTest() throws ResourceDoesNotExistException {
+        String email = "user@test.com";
+        String password = "password";
+        User user = getUser("abc");
+        when(userRepository.findByEmailAndIsDeletedFalse(email)).thenReturn(Optional.of(user));
+        var result = userService.getUserByEmail(email);
+        Assertions.assertInstanceOf(User.class, result);
+        Assertions.assertEquals(email, result.getEmail());
     }
 
     private User getUser(String id) {

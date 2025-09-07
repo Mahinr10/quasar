@@ -2,10 +2,14 @@ package com.personal.quasar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.personal.quasar.model.dto.UserDTO;
+import com.personal.quasar.model.dto.UserDetailsDTO;
 import com.personal.quasar.model.entity.User;
+import com.personal.quasar.service.impl.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -18,6 +22,9 @@ public class UserControllerTest extends ControllerTest {
     @InjectMocks
     UserController userController;
 
+    @Mock
+    UserService userService;
+
     @BeforeEach
     public void executeBeforeEach() {
         var mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
@@ -28,8 +35,8 @@ public class UserControllerTest extends ControllerTest {
         var id = "abc";
         var userDTO = getUserDTO();
 
-        when(getUserService().update(id, userDTO)).thenReturn(userDTO);
-        when(getUserService().loadUserByUsername("testUser")).thenReturn(userDTO);
+        when(userService.update(id, userDTO)).thenReturn(userDTO);
+        when(getUserDetailsService().loadUserByUsername("testUser")).thenReturn(getUserDetailsDTO());
         getMockMvc().perform(put("/api/v1/user/{id}", id)
                 .contentType("application/json")
                 .content(new ObjectMapper().writeValueAsString(userDTO)))
@@ -56,5 +63,11 @@ public class UserControllerTest extends ControllerTest {
         return userDTO;
     }
 
+    private UserDetailsDTO getUserDetailsDTO() {
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
+        userDetailsDTO.setUsername("user@test.com");
+        userDetailsDTO.setPassword("password");
+        return userDetailsDTO;
+    }
 
 }
