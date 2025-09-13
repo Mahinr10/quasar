@@ -6,6 +6,7 @@ import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,5 +24,11 @@ public class UserController {
     public ResponseEntity<UserDTO> update(@PathVariable String id,@Validated @RequestBody UserDTO user)
             throws ImmutableFieldModificationException, ResourceDoesNotExistException {
         return ResponseEntity.ok(userService.update(id, user));
+    }
+
+    @PutMapping("role/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> updateRole(@PathVariable String id, @Validated @RequestBody UserDTO user) {
+        return null;
     }
 }

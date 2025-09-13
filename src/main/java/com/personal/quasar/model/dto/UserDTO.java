@@ -24,4 +24,5 @@ public class UserDTO extends BaseDTO {
     private String email;
     @NotNull
     private UserRole userRole = UserRole.USER;
+    private String TimeZoneId;
 }

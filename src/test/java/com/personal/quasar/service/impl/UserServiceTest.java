@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UserServiceTest extends UnitTest {
-    @Mock
+    @MockitoBean
     UserRepository userRepository;
 
     @Mock
