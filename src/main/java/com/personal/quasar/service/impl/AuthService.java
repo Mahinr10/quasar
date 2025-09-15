@@ -5,6 +5,7 @@ import com.personal.quasar.model.dto.AuthRequestDTO;
 import com.personal.quasar.model.dto.AuthResponseDTO;
 import com.personal.quasar.model.entity.User;
 import com.personal.quasar.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
+@Slf4j
 public class AuthService {
     @Autowired
     private UserService userService;
@@ -25,6 +27,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     public AuthResponseDTO registerAndLogin(AuthRequestDTO request) {
         if(userService.checkUserWithEmailExist(request.getUserName())) {
+            log.info("User with same email is trying to register - {}", request.getUserName());
             throw new RuntimeException("User already exists with email: " + request.getUserName());
         }
         saveUser(request);
@@ -32,6 +35,7 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO request) {
+        log.info("A logging attempt is being initiated with the email - {}", request.getUserName());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUserName(), request.getPassword()
         ));
@@ -40,6 +44,7 @@ public class AuthService {
         result.setAccessToken(jwtUtil.generateAccessToken(userDTO));
         result.setRefreshToken(jwtUtil.generateRefreshToken(userDTO.getEmail()));
         result.setExpiredAfter("3600s");
+        log.info("The logging attempt is successful for the user with email - {}", request.getUserName());
         return result;
     }
 

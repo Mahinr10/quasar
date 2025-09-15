@@ -34,3 +34,6 @@ mongodbConfig:
     - localhost:27019
     - localhost:27020
   database: annihilation
+
+logging:
+  config: classpath:logback-spring.xml
