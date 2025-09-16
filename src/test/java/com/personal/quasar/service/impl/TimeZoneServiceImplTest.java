@@ -6,6 +6,7 @@ import com.personal.quasar.model.dto.TimeZoneDTO;
 import com.personal.quasar.model.entity.TimeZone;
 import com.personal.quasar.model.mapper.TimeZoneMapper;
 import com.personal.quasar.service.AuditService;
+import com.personal.quasar.service.TimeZoneService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -130,6 +131,13 @@ public class TimeZoneServiceImplTest extends UnitTest {
 
         verify(timeZoneRepository, never()).save(any());
         verify(auditService, never()).populateAuditFields(any());
+    }
+
+    @Test
+    public void isValidTimeZoneTest() {
+        TimeZone timeZone = getTimeZone("Europe/London");
+        when(timeZoneRepository.findByTimeZoneId(timeZone.getTimeZoneId())).thenReturn(Optional.of(timeZone));
+        Assertions.assertTrue(timeZoneService.isValidTImeZone(timeZone.getTimeZoneId()));
     }
 
     private TimeZone getTimeZone(String timeZoneId) {

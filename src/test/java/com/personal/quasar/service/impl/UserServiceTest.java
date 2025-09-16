@@ -1,13 +1,19 @@
 package com.personal.quasar.service.impl;
 
 import com.personal.quasar.UnitTest;
+import com.personal.quasar.common.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.UnprivilegedToModificationException;
 import com.personal.quasar.dao.UserRepository;
 import com.personal.quasar.common.exception.ImmutableFieldModificationException;
 import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
+import com.personal.quasar.model.entity.TimeZone;
 import com.personal.quasar.model.entity.User;
+import com.personal.quasar.model.enums.UserRole;
 import com.personal.quasar.model.mapper.UserMapper;
 import com.personal.quasar.service.AuditService;
+import com.personal.quasar.service.TimeZoneService;
+import com.personal.quasar.service.UserProfileFacade;
 import com.personal.quasar.service.impl.UserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -41,6 +47,12 @@ public class UserServiceTest extends UnitTest {
 
     @Mock
     AuditService auditService;
+
+    @Mock
+    UserProfileFacade userProfileFacade;
+
+    @Mock
+    TimeZoneService timeZoneService;
 
     @InjectMocks
     UserService userService;
@@ -94,6 +106,7 @@ public class UserServiceTest extends UnitTest {
         when(userRepository.save(any())).thenReturn(newUser);
 
         when(userMapper.entityToDTO(newUser)).thenReturn(newUserDTO);
+        when(userMapper.dtoToEntity(newUserDTO)).thenReturn(newUser);
 
         var result = userService.update(id, newUserDTO);
 
@@ -210,12 +223,74 @@ public class UserServiceTest extends UnitTest {
         Assertions.assertEquals(email, result.getEmail());
     }
 
+    @Test
+    public void updateUserRoleByUserWithUserRole() throws Exception {
+        var existingUser = getUser("1");
+        var updatedUser = getUserDTO("2");
+        updatedUser.setUserRole(UserRole.ADMIN);
+
+        when(userProfileFacade.isUsersWithRole(UserRole.ADMIN)).thenReturn(false);
+        when(userRepository.findByIdAndIsDeletedFalse("1")).thenReturn(Optional.of(existingUser));
+
+        Assertions.assertThrows(UnprivilegedToModificationException.class, () -> userService.update("1", updatedUser));
+    }
+
+    @Test
+    public void updateUserRoleByUserWithAdminRole() throws Exception {
+        var existingUser = getUser("1");
+        var updatedUser = getUserDTO("1");
+        var newUser = getUser("1");
+
+        updatedUser.setUserRole(UserRole.ADMIN);
+        newUser.setUserRole(UserRole.ADMIN);
+
+        when(userProfileFacade.isUsersWithRole(UserRole.ADMIN)).thenReturn(true);
+        when(userRepository.findByIdAndIsDeletedFalse("1")).thenReturn(Optional.of(existingUser));
+        when(userMapper.dtoToEntity(updatedUser)).thenReturn(newUser);
+        when(userMapper.entityToDTO(any())).thenReturn(updatedUser);
+        doNothing().when(auditService).populateAuditFields(any());
+
+        var result = userService.update("1", updatedUser);
+        Assertions.assertEquals(result.getId(), updatedUser.getId());
+        verify(auditService, times(1)).populateAuditFields(any());
+    }
+
+    @Test
+    public void updateWithInvalidTimeZone() throws Exception {
+        var existingUser = getUser("1");
+        var updatedUser = getUserDTO("1");
+        var newUser = getUser("1");
+
+        var timeZoneId = "invalidTimeZone";
+        updatedUser.setTimeZoneId(timeZoneId);
+
+        when(userProfileFacade.isUsersWithRole(UserRole.ADMIN)).thenReturn(false);
+        when(userRepository.findByIdAndIsDeletedFalse("1")).thenReturn(Optional.of(existingUser));
+        when(timeZoneService.isValidTImeZone(timeZoneId)).thenReturn(false);
+
+        Assertions.assertThrows(InvalidFieldException.class, () -> userService.update("1", updatedUser));
+    }
+
+    @Test
+    public void updateWithNullTimeZone() throws Exception {
+        var existingUser = getUser("1");
+        var updatedUser = getUserDTO("1");
+        var newUser = getUser("1");
+        existingUser.setTimeZoneId("invalidTimeZone");
+
+        when(userProfileFacade.isUsersWithRole(UserRole.ADMIN)).thenReturn(false);
+        when(userRepository.findByIdAndIsDeletedFalse("1")).thenReturn(Optional.of(existingUser));
+
+        Assertions.assertThrows(InvalidFieldException.class, () -> userService.update("1", updatedUser));
+    }
+
     private User getUser(String id) {
         var user = new User();
         user.setId(id);
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("user@test.com");
+        user.setUserRole(UserRole.USER);
         return user;
     }
 
@@ -225,6 +300,7 @@ public class UserServiceTest extends UnitTest {
         userDTO.setFirstName("John");
         userDTO.setLastName("Doe");
         userDTO.setEmail("user@test.com");
+        userDTO.setUserRole(UserRole.USER);
         return userDTO;
     }
 

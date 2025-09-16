@@ -1,7 +1,9 @@
 package com.personal.quasar.controller;
 
 import com.personal.quasar.common.exception.ImmutableFieldModificationException;
+import com.personal.quasar.common.exception.InvalidFieldException;
 import com.personal.quasar.common.exception.ResourceDoesNotExistException;
+import com.personal.quasar.common.exception.UnprivilegedToModificationException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +24,8 @@ public class UserController {
     UserService userService;
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable String id,@Validated @RequestBody UserDTO user)
-            throws ImmutableFieldModificationException, ResourceDoesNotExistException {
+            throws ImmutableFieldModificationException, ResourceDoesNotExistException,
+            UnprivilegedToModificationException, InvalidFieldException {
         return ResponseEntity.ok(userService.update(id, user));
-    }
-
-    @PutMapping("role/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> updateRole(@PathVariable String id, @Validated @RequestBody UserDTO user) {
-        return null;
     }
 }

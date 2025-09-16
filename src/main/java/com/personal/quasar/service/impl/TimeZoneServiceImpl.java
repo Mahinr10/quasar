@@ -1,5 +1,7 @@
 package com.personal.quasar.service.impl;
 
+import com.personal.quasar.common.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.dao.TimeZoneRepository;
 import com.personal.quasar.model.dto.TimeZoneDTO;
 import com.personal.quasar.model.entity.TimeZone;
@@ -13,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_TIMEZONE;
+
 public class TimeZoneServiceImpl implements TimeZoneService {
     @Autowired
     TimeZoneRepository timeZoneRepository;
@@ -43,6 +48,11 @@ public class TimeZoneServiceImpl implements TimeZoneService {
             handleUnselectedTimeZone(timeZoneDTO);
         }
         return timeZoneDTO;
+    }
+
+    @Override
+    public Boolean isValidTImeZone(String timeZoneId)  {
+        return timeZoneRepository.findByTimeZoneId(timeZoneId).isPresent();
     }
 
     private List<TimeZoneDTO> getTimeZoneDTOs(Set<String> selectedTimeZoneIds) {

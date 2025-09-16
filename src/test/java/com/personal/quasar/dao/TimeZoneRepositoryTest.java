@@ -56,4 +56,32 @@ public class TimeZoneRepositoryTest extends UnitTest {
 
         timeZoneRepository.deleteById(timeZone.getId());
     }
+
+    @Test
+    public void findByTimeZoneIdIsDeletedFalseTest() {
+        TimeZone timeZone1 = new TimeZone();
+        timeZone1.setId(UUID.randomUUID().toString());
+        timeZone1.setTimeZoneId("Asia/Tokyo");
+        timeZone1.setIsDeleted(false);
+
+        TimeZone timeZone2 = new TimeZone();
+        timeZone2.setId(UUID.randomUUID().toString());
+        timeZone2.setTimeZoneId("Europe/London");
+        timeZone2.setIsDeleted(true);
+
+        timeZoneRepository.save(timeZone1);
+        timeZoneRepository.save(timeZone2);
+
+        var result = timeZoneRepository.findByTimeZoneIdAndIsDeletedFalse(timeZone1.getTimeZoneId());
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("Asia/Tokyo", result.get().getTimeZoneId());
+
+        result = timeZoneRepository.findByTimeZoneIdAndIsDeletedFalse(timeZone2.getTimeZoneId());
+
+        Assertions.assertFalse(result.isPresent());
+
+        timeZoneRepository.deleteById(timeZone1.getId());
+        timeZoneRepository.deleteById(timeZone2.getId());
+    }
 }
