@@ -1,10 +1,4 @@
 spring:
-  data:
-    mongodb:
-      database: testdb
-  mongodb:
-    embedded:
-      version: 7.0.0
   application:
     name: quasar
 server:
@@ -34,7 +28,6 @@ management:
         enabled: true
 
 mongodbConfig:
-  enable: false
   replicaSet: rs0
   hosts:
     - localhost:27018
