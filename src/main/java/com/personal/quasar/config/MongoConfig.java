@@ -26,7 +26,7 @@ public class MongoConfig {
     private String database;
     @Bean
     public MongoClient mongoClient() {
-        String connectionString = String.format("mongodb://%s/%s?replicaSet=%s",
+        String connectionString = String.format("mongodb://%s/%s?replicaSet=%s&readPreference=secondaryPreferred",
                 String.join(",", hosts), database, replicaSet);
         return MongoClients.create(connectionString);
     }
