@@ -11,8 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-@ActiveProfiles("test")
-public class TimeZoneRepositoryTest extends UnitTest {
+@DataMongoTest
+public class TimeZoneRepositoryTest {
     @Autowired
     TimeZoneRepository timeZoneRepository;
 
