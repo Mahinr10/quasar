@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import static com.personal.quasar.util.ExceptionConstants.UNPRIVILEGED_TO_MODIFICATION_ERROR;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceDoesNotExistException.class)
@@ -27,5 +29,16 @@ public class GlobalExceptionHandler {
         errorResponseDTO.setMessage(ex.getMessage());
         errorResponseDTO.setPath(request.getDescription(false));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+    }
+
+
+    @ExceptionHandler(UnprivilegedToModificationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUnprivilegedToModificationException(UnprivilegedToModificationException ex, WebRequest request) {
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponseDTO.setError(UNPRIVILEGED_TO_MODIFICATION_ERROR);
+        errorResponseDTO.setMessage(ex.getMessage());
+        errorResponseDTO.setPath(request.getDescription(false));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponseDTO);
     }
 }

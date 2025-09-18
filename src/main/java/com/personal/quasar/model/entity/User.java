@@ -21,4 +21,5 @@ public class User extends AuditEntity {
     private String password;
     private String email;
     private UserRole userRole = UserRole.USER;
+    private String timeZoneId;
 }
