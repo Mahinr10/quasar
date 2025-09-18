@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-
+@ActiveProfiles("test")
 public class TimeZoneRepositoryTest extends UnitTest {
     @Autowired
     TimeZoneRepository timeZoneRepository;
