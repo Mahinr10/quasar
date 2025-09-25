@@ -1,14 +1,20 @@
 package com.personal.quasar.service.impl;
 
+import com.personal.quasar.common.exception.InvalidFieldException;
+import com.personal.quasar.common.exception.UnprivilegedToModificationException;
 import com.personal.quasar.dao.UserRepository;
 import com.personal.quasar.common.exception.ImmutableFieldModificationException;
 import com.personal.quasar.common.exception.ResourceDoesNotExistException;
 import com.personal.quasar.model.dto.UserDTO;
 import com.personal.quasar.model.entity.User;
+import com.personal.quasar.model.enums.UserRole;
 import com.personal.quasar.model.mapper.UserMapper;
 import com.personal.quasar.service.AuditService;
+import com.personal.quasar.service.TimeZoneService;
+import com.personal.quasar.service.UserProfileFacade;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,8 +27,10 @@ import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_ENTI
 import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_NOT_FOUND_WITH_EMAIL;
 import static com.personal.quasar.util.ValidationConstants.EMAIL_REGEX;
 import static com.personal.quasar.util.ValidationErrorMessages.EMAIL_CANNOT_BE_NULL;
+import static com.personal.quasar.util.ValidationErrorMessages.NON_ADMIN_USER_ROLE_MODIFICATION_ERROR_MESSAGE;
 import static com.personal.quasar.util.ValidationErrorMessages.PASSWORD_CANNOT_BE_NULL;
 import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_EMAIL;
+import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_TIMEZONE;
 
 @Service
 @Validated
@@ -38,6 +46,12 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserProfileFacade userProfileFacade;
+
+    @Autowired
+    private TimeZoneService timeZoneService;
+
     public UserDTO get(String id) throws ResourceDoesNotExistException {
         var user = userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceDoesNotExistException(USER_ENTITY, id));
@@ -48,7 +62,8 @@ public class UserService {
         return userRepository.existsByEmailAndIsDeletedFalse(email);
     }
     public UserDTO update(String id, UserDTO updatedUser)
-            throws ImmutableFieldModificationException, ResourceDoesNotExistException {
+            throws ImmutableFieldModificationException, ResourceDoesNotExistException,
+            UnprivilegedToModificationException, InvalidFieldException {
         User existingUser = userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(
                     () -> new ResourceDoesNotExistException(USER_ENTITY, id)
@@ -56,14 +71,39 @@ public class UserService {
         if (!existingUser.getEmail().equals(updatedUser.getEmail())) {
             throw new ImmutableFieldModificationException(List.of(UserDTO.Fields.email));
         }
+        validateTimeZone(existingUser, updatedUser);
+        validateUpdatingUserRole(existingUser, updatedUser);
+
         if (equalsIgnoringAuditFields(existingUser, updatedUser)) {
             return updatedUser;
         }
 
-        auditService.populateAuditFields(existingUser);
+        User newUser = userMapper.dtoToEntity(updatedUser);
+        newUser.setId(id);
+        newUser.setCreatedBy(existingUser.getCreatedBy());
+        newUser.setCreatedDate(existingUser.getCreatedDate());
+        auditService.populateAuditFields(newUser);
 
-        var savedUser = userRepository.save(existingUser);
+        var savedUser = userRepository.save(newUser);
         return userMapper.entityToDTO(savedUser);
+    }
+
+    private void validateTimeZone(User existingUser, UserDTO newUser) throws InvalidFieldException {
+        if(existingUser.getTimeZoneId() == null && newUser.getTimeZoneId() == null) {
+            return;
+        }
+        if(newUser.getTimeZoneId() == null) {
+            throw new InvalidFieldException(PROVIDED_INVALID_TIMEZONE);
+        }
+        if(!timeZoneService.isValidTImeZone(newUser.getTimeZoneId())) {
+            throw new InvalidFieldException(PROVIDED_INVALID_TIMEZONE);
+        }
+    }
+
+    private void validateUpdatingUserRole(User existingUser, UserDTO newUser) throws UnprivilegedToModificationException {
+        if(!existingUser.getUserRole().equals(newUser.getUserRole()) && !userProfileFacade.isUsersWithRole(UserRole.ADMIN)) {
+            throw new UnprivilegedToModificationException(NON_ADMIN_USER_ROLE_MODIFICATION_ERROR_MESSAGE);
+        }
     }
 
     private boolean equalsIgnoringAuditFields(User user, UserDTO userDTO) {

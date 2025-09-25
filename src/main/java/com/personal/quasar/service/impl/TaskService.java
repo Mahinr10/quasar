@@ -16,29 +16,29 @@ import java.util.UUID;
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TaskMapper taskMapper;
-    @Autowired
-    private AuditService auditService;
-    @Autowired
-    private TaskValidator taskValidator;
-
-    public TaskDTO create(TaskDTO task) throws InvalidFieldException {
-        taskValidator.validateScheduledDate(task.getScheduledDate());
-        var newTask = taskMapper.dtoToEntity(task);
-        auditService.populateAuditFields(newTask);
-        newTask.setId(UUID.randomUUID().toString());
-        Task savedTask = taskRepository.save(newTask);
-        return taskMapper.entityToDTO(savedTask);
-    }
-
     public TaskDTO get(String id) {
         return taskRepository.findByIdAndIsDeletedFalse(id)
                 .map(taskMapper::entityToDTO)
                 .orElseThrow(() -> new RuntimeException("Task not found with id: " + id));
+    }
+
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskMapper taskMapper;
+    @Autowired
+    private AuditService auditService;
+
+    @Autowired
+    private TaskValidator taskValidator;
+
+    public TaskDTO create(TaskDTO task) throws InvalidFieldException {
+        var newTask = taskMapper.dtoToEntity(task);
+        Task savedTask = taskRepository.save(newTask);
+        taskValidator.validateScheduledDate(task.getScheduledDate());
+        auditService.populateAuditFields(newTask);
+        newTask.setId(UUID.randomUUID().toString());
+        return taskMapper.entityToDTO(savedTask);
     }
 
     public List<TaskDTO> getAllTasks() {
