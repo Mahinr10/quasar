@@ -14,12 +14,12 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.List;
 
-//@Configuration
-//@ConditionalOnProperty(name = "mongodb-config.enable", havingValue = "true", matchIfMissing = true)
-//@ConfigurationProperties(prefix = "mongodb-config")
-//@Data
-//@NoArgsConstructor
-//@EnableMongoRepositories(basePackages = "com.personal.quasar.dao")
+@Configuration
+@ConditionalOnProperty(name = "mongodb-config.enable", havingValue = "true", matchIfMissing = true)
+@ConfigurationProperties(prefix = "mongodb-config")
+@Data
+@NoArgsConstructor
+@EnableMongoRepositories(basePackages = "com.personal.quasar.dao")
 public class MongoConfig {
     private String replicaSet;
     private List<String> hosts;

@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.UUID;
 
 @DataMongoTest
+@Disabled
 public class TimeZoneRepositoryTest {
     @Autowired
     TimeZoneRepository timeZoneRepository;

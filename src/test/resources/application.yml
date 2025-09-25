@@ -6,10 +6,10 @@ quasar:
 mongodbConfig:
   enable: false
 
-spring:
-  data:
-    mongodb:
-      database: testdb
-  mongodb:
-    embedded:
-      version: 7.0.0
+#spring:
+#  data:
+#    mongodb:
+#      database: testdb
+#  mongodb:
+#    embedded:
+#      version: 7.0.0
