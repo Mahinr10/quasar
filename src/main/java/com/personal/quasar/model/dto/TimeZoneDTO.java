@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TimeZoneDTO extends BaseDTO {
+public class TimeZoneDTO extends AuditDTO {
     private String timeZoneId;
     private Boolean isSelected;
 }

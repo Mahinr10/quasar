@@ -9,6 +9,7 @@ import com.personal.quasar.model.mapper.TimeZoneMapper;
 import com.personal.quasar.service.AuditService;
 import com.personal.quasar.service.TimeZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_TIMEZONE;
 
+@Component
 public class TimeZoneServiceImpl implements TimeZoneService {
     @Autowired
     TimeZoneRepository timeZoneRepository;

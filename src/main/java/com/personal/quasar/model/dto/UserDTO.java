@@ -15,7 +15,7 @@ import java.util.TimeZone;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @FieldNameConstants
-public class UserDTO extends BaseDTO {
+public class UserDTO extends AuditDTO {
     @Size(max = 50)
     private String firstName;
     @Size(max = 50)
