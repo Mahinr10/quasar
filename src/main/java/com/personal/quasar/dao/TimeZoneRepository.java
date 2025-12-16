@@ -15,4 +15,5 @@ public interface TimeZoneRepository extends MongoRepository<TimeZone, String> {
     Optional<TimeZone> findByTimeZoneId(String timeZoneId);
 
     Optional<TimeZone> findByTimeZoneIdAndIsDeletedFalse(String timeZoneId);
+
 }

@@ -7,11 +7,15 @@ import com.personal.quasar.service.impl.TaskService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +32,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody TaskDTO task) throws InvalidFieldException {
+        log.info("createTask is started with payload - {}", task);
         TaskDTO result = taskService.create(task);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
@@ -45,6 +50,20 @@ public class TaskController {
         return Optional.ofNullable(task)
                 .map(t -> new ResponseEntity<>(t, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/scheduled")
+    public ResponseEntity<List<TaskDTO>> getTasksByDate(
+            @DateTimeFormat(pattern = "dd-MM-yyyy")
+            @RequestParam("date")
+            Date date
+    ) {
+        log.info("getTasksByDate started with with date - {}", date);
+        LocalDate localDate = date.toInstant()
+                .atZone(ZoneId.of("Asia/Dhaka")) // Your timezone: +06
+                .toLocalDate();
+        Date utcDate = Date.from(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
+        return new ResponseEntity<>(taskService.getAllTasksByDate(utcDate), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

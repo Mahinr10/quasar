@@ -16,6 +16,6 @@ public class Task extends AuditEntity {
     private String name;
     private String description;
     private Boolean completed = false;
-    private Date ScheduledDate = new Date();
+    private Date scheduledDate = new Date();
     private TaskPriority priority = TaskPriority.MEDIUM;
 }
