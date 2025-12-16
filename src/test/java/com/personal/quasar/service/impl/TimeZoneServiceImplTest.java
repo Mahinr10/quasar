@@ -68,7 +68,8 @@ public class TimeZoneServiceImplTest extends UnitTest {
         savedTimeZone.setIsDeleted(false);
 
         when(timeZoneRepository.findByTimeZoneId("zone1")).thenReturn(Optional.of(existingTimeZone));
-        when(timeZoneRepository.save(existingTimeZone)).thenReturn(savedTimeZone);
+        when(timeZoneRepository.save(any())).thenReturn(savedTimeZone);
+        when(timeZoneMapper.entityToDTO(any())).thenReturn(timeZoneDTO);
 
         var result = timeZoneService.updateTimeZone(timeZoneDTO);
         Assertions.assertNotNull(result);
@@ -110,6 +111,7 @@ public class TimeZoneServiceImplTest extends UnitTest {
 
         when(timeZoneRepository.findByTimeZoneId("zone3")).thenReturn(Optional.of(existingTimeZone));
         when(timeZoneRepository.save(existingTimeZone)).thenReturn(savedTimeZone);
+        when(timeZoneMapper.entityToDTO(any())).thenReturn(timeZoneDTO);
 
         var result = timeZoneService.updateTimeZone(timeZoneDTO);
 

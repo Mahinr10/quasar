@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BaseDTO {
-    String id;
+    private String id;
 }
