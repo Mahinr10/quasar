@@ -10,5 +10,4 @@ import org.springframework.stereotype.Component;
 public interface TaskMapper {
     TaskDTO entityToDTO(Task task);
     Task dtoToEntity(TaskDTO taskDTO);
-
 }

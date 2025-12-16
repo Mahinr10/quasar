@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TaskDTO extends BaseDTO {
+public class TaskDTO extends AuditDTO {
     @NotNull
     @Size(min = 3, max = 100)
     private String name;
