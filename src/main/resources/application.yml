@@ -1,18 +1,18 @@
 spring:
   application:
     name: quasar
-  datasource:
-    url: jdbc:postgresql://localhost:5432/white_dwarf
-    username: User
-    password: mahin123
-    driver-class-name: org.postgresql.Driver
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/white_dwarf
+#    username: User
+#    password: mahin123
+#    driver-class-name: org.postgresql.Driver
+#    jpa:
+#      hibernate:
+#        ddl-auto: update
+#      show-sql: true
+#      properties:
+#        hibernate:
+#          dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: localhost:9092,localhost:9094,localhost:9095
     producer:
