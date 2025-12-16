@@ -14,6 +14,8 @@ import com.personal.quasar.service.TimeZoneService;
 import com.personal.quasar.service.UserProfileFacade;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.context.annotation.ApplicationScope;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_ENTITY;
 import static com.personal.quasar.util.RepositoryErrorMessageConstants.USER_NOT_FOUND_WITH_EMAIL;
@@ -33,8 +36,7 @@ import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_
 import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_TIMEZONE;
 
 @Service
-@Validated
-@ApplicationScope
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -58,12 +60,21 @@ public class UserService {
         return userMapper.entityToDTO(user);
     }
 
+    public UserDTO get() throws ResourceDoesNotExistException {
+        log.info("get method started");
+        var email = userProfileFacade.getActiveUserId();
+        var user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceDoesNotExistException(USER_ENTITY, email));
+        return userMapper.entityToDTO(user);
+    }
+
     public Boolean checkUserWithEmailExist(String email) {
         return userRepository.existsByEmailAndIsDeletedFalse(email);
     }
     public UserDTO update(String id, UserDTO updatedUser)
             throws ImmutableFieldModificationException, ResourceDoesNotExistException,
             UnprivilegedToModificationException, InvalidFieldException {
+        log.info("update method started with id - {} and payload - {}", id, updatedUser);
         User existingUser = userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(
                     () -> new ResourceDoesNotExistException(USER_ENTITY, id)
@@ -75,13 +86,16 @@ public class UserService {
         validateUpdatingUserRole(existingUser, updatedUser);
 
         if (equalsIgnoringAuditFields(existingUser, updatedUser)) {
+            updatedUser.setId(id);
             return updatedUser;
         }
 
         User newUser = userMapper.dtoToEntity(updatedUser);
+        newUser.setEmail(existingUser.getEmail());
         newUser.setId(id);
         newUser.setCreatedBy(existingUser.getCreatedBy());
         newUser.setCreatedDate(existingUser.getCreatedDate());
+        newUser.setPassword(existingUser.getPassword());
         auditService.populateAuditFields(newUser);
 
         var savedUser = userRepository.save(newUser);
@@ -107,11 +121,13 @@ public class UserService {
     }
 
     private boolean equalsIgnoringAuditFields(User user, UserDTO userDTO) {
-        return user.getFirstName().equals(userDTO.getFirstName()) &&
-                user.getLastName().equals(userDTO.getLastName()) &&
-                user.getEmail().equals(userDTO.getEmail()) &&
-                user.getUserRole().equals(userDTO.getUserRole());
+        return Objects.equals(user.getFirstName(), userDTO.getFirstName()) &&
+                Objects.equals(user.getLastName(), userDTO.getLastName()) &&
+                Objects.equals(user.getEmail(), userDTO.getEmail()) &&
+                Objects.equals(user.getUserRole(), userDTO.getUserRole()) &&
+                Objects.equals(user.getTimeZoneId(), userDTO.getTimeZoneId());
     }
+
     public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmailAndIsDeletedFalse(username)
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_WITH_EMAIL + " " + username));

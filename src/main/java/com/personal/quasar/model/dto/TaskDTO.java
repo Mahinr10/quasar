@@ -20,6 +20,6 @@ public class TaskDTO extends AuditDTO {
     @Size(max = 1024)
     private String description;
     private Boolean completed;
-    private Date ScheduledDate = new Date();
+    private Date scheduledDate = new Date();
     private TaskPriority priority = TaskPriority.MEDIUM;
 }

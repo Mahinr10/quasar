@@ -8,6 +8,7 @@ import com.personal.quasar.model.entity.TimeZone;
 import com.personal.quasar.model.mapper.TimeZoneMapper;
 import com.personal.quasar.service.AuditService;
 import com.personal.quasar.service.TimeZoneService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +17,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.personal.quasar.util.ValidationErrorMessages.PROVIDED_INVALID_TIMEZONE;
 
 @Component
+@Slf4j
 public class TimeZoneServiceImpl implements TimeZoneService {
     @Autowired
     TimeZoneRepository timeZoneRepository;
@@ -45,16 +48,24 @@ public class TimeZoneServiceImpl implements TimeZoneService {
     @Override
     public TimeZoneDTO updateTimeZone(TimeZoneDTO timeZoneDTO) {
         if (timeZoneDTO.getIsSelected()) {
-            handleSelectedTimeZone(timeZoneDTO);
+            return handleSelectedTimeZone(timeZoneDTO);
         } else {
-            handleUnselectedTimeZone(timeZoneDTO);
+            return handleUnselectedTimeZone(timeZoneDTO);
         }
-        return timeZoneDTO;
     }
 
     @Override
     public Boolean isValidTImeZone(String timeZoneId)  {
         return timeZoneRepository.findByTimeZoneId(timeZoneId).isPresent();
+    }
+
+    @Override
+    public Set<TimeZoneDTO> getSelectedTimeZones() {
+        log.info("getSelectedTimeZones method started");
+        List<TimeZone> selectedTimeZones = timeZoneRepository.findByIsDeletedFalse().orElse(new ArrayList<>());
+        return selectedTimeZones.stream()
+                .map(timeZoneMapper::entityToDTO)
+                .collect(Collectors.toSet());
     }
 
     private List<TimeZoneDTO> getTimeZoneDTOs(Set<String> selectedTimeZoneIds) {
@@ -73,30 +84,32 @@ public class TimeZoneServiceImpl implements TimeZoneService {
         return timeZoneDTOs;
     }
 
-    private void handleSelectedTimeZone(TimeZoneDTO timeZoneDTO) {
+    private TimeZoneDTO handleSelectedTimeZone(TimeZoneDTO timeZoneDTO) {
         var existingTimeZone = timeZoneRepository.findByTimeZoneId(timeZoneDTO.getTimeZoneId());
         if (existingTimeZone.isPresent()) {
-            updateExistingTimeZoneIfDeleted(existingTimeZone.get());
+            return updateExistingTimeZoneIfDeleted(existingTimeZone.get());
         } else {
-            createNewTimeZone(timeZoneDTO);
+            return createNewTimeZone(timeZoneDTO);
         }
     }
 
-    private void handleUnselectedTimeZone(TimeZoneDTO timeZoneDTO) {
+    private TimeZoneDTO handleUnselectedTimeZone(TimeZoneDTO timeZoneDTO) {
         var existingTimeZoneOpt = timeZoneRepository.findByTimeZoneId(timeZoneDTO.getTimeZoneId());
         existingTimeZoneOpt.ifPresent(this::markTimeZoneAsDeleted);
+        return existingTimeZoneOpt.map(timeZoneMapper::entityToDTO).orElse(null);
     }
 
-    private void updateExistingTimeZoneIfDeleted(TimeZone existingTimeZone) {
+    private TimeZoneDTO updateExistingTimeZoneIfDeleted(TimeZone existingTimeZone) {
         existingTimeZone.setIsDeleted(false);
         auditService.populateAuditFields(existingTimeZone);
-        timeZoneRepository.save(existingTimeZone);
+        var timeZone = timeZoneRepository.save(existingTimeZone);
+        return timeZoneMapper.entityToDTO(timeZone);
     }
 
-    private void createNewTimeZone(TimeZoneDTO timeZoneDTO) {
+    private TimeZoneDTO createNewTimeZone(TimeZoneDTO timeZoneDTO) {
         TimeZone newTimeZone = timeZoneMapper.dtoToEntity(timeZoneDTO);
         auditService.populateAuditFields(newTimeZone);
-        timeZoneRepository.save(newTimeZone);
+        return timeZoneMapper.entityToDTO(timeZoneRepository.save(newTimeZone));
     }
 
     private void markTimeZoneAsDeleted(TimeZone existingTimeZone) {

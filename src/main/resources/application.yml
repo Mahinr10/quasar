@@ -1,8 +1,56 @@
 spring:
   application:
     name: quasar
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/white_dwarf
+#    username: User
+#    password: mahin123
+#    driver-class-name: org.postgresql.Driver
+#    jpa:
+#      hibernate:
+#        ddl-auto: update
+#      show-sql: true
+#      properties:
+#        hibernate:
+#          dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9094,localhost:9095
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        acks: all
+        enable.idempotence: true
+        retries: 2147483647
+        max.in.flight.requests.per.connection: 5
+        request.timeout.ms: 30000
+        delivery.timeout.ms: 120000
+    consumer:
+      group-id: red-giant
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring:
+          deserializer:
+            key:
+              delegate:
+                class: org.apache.kafka.common.serialization.StringDeserializer
+            value:
+              delegate:
+                class: org.springframework.kafka.support.serializer.JsonDeserializer
+          json:
+            trusted:
+              packages: "*"
+            value:
+              default:
+                type: com.personal.quasar.model.dto.UserDTO
+            use:
+              type:
+                headers: false
 server:
-  port: 8443
+  port: 8080
   ssl:
     enabled: true
     key-store: classpath:cert/keystore.p12
@@ -34,6 +82,11 @@ mongodbConfig:
     - localhost:27019
     - localhost:27020
   database: annihilation
+
+app:
+  kafka:
+    topics:
+      user-topic: red-giant.user
 
 logging:
   config: classpath:logback-spring.xml
