@@ -6,6 +6,7 @@ import com.personal.quasar.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.processing.AbstractProcessor;
 import java.util.Date;
 
 @Component
@@ -29,6 +30,10 @@ public class AuditServiceImpl implements AuditService {
     private void populateUpdateAuditFields(AuditEntity auditEntity) {
         auditEntity.setLastModifiedBy(userProfileFacade.getActiveUserId());
         auditEntity.setLastModifiedDate(new Date());
+    }
+
+    public void test() {
+        AbstractProcessor p;
     }
 
 }
