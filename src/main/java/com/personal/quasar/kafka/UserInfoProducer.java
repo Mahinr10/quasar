@@ -19,7 +19,7 @@ public class UserInfoProducer {
 
     public void produce(UserDTO user) {
         String key = user.getId();
-        kafkaTemplate.send(TOPIC, user)
+        kafkaTemplate.send(TOPIC, key, user)
                 .whenComplete((result, ex) -> {
                     if(ex != null) {
                         ex.printStackTrace();

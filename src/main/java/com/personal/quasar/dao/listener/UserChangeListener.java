@@ -74,7 +74,7 @@ public class UserChangeListener {
                                  .cursor()) {
                 while (cursor.hasNext()) {
                     var event = cursor.next();
-                    if(event.getOperationType() == OperationType.INSERT) {
+                    if(event.getOperationType() == OperationType.INSERT || event.getOperationType() == OperationType.REPLACE) {
                         Document document = event.getFullDocument();
                         var user = userDocumentMapper.toDto(document);
                         userInfoProducer.produce(user);

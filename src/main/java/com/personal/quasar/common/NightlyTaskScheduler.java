@@ -41,6 +41,6 @@ public class NightlyTaskScheduler {
         user.setId(UUID.randomUUID().toString());
         user.setEmail("test-email");
         user.setFirstName("test-name");
-        userInfoProducer.produce(user);
+        //userInfoProducer.produce(user);
     }
 }
